@@ -39,6 +39,11 @@ const questions = [
         type: "input",
         name: "test",
         message: "Test instructions"
+    },
+    {
+        type: "input",
+        name: "questions",
+        message: "Enter your GitHub username"
     }
 ];
 
@@ -79,6 +84,22 @@ function init() {
             // Usage
             writeToFile('README.md', '## Usage\n');
             writeToFile('README.md', `${answers.usage}\n\n`);
+
+            // License
+            writeToFile('README.md', '## License\n');
+            writeToFile('README.md', `${answers.license}\n\n`);
+
+            // Contributing
+            writeToFile('README.md', '## How to Contribute\n');
+            writeToFile('README.md', `${answers.contributing}\n\n`);
+
+            // Tests
+            writeToFile('README.md', '## Tests\n');
+            writeToFile('README.md', `${answers.test}\n\n`);
+
+            // Questions
+            writeToFile('README.md', '## Questions\n');
+            writeToFile('README.md', `https://www.github.com/${answers.questions}\n\n`);
         });
 }
 
