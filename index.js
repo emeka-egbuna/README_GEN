@@ -1,7 +1,9 @@
-const fs = require("fs");
-const path = require('path');
-const inquirer = require("inquirer");
-const generateMarkdown = require("./utils/generateMarkdown");
+//const fs = require("fs");
+import { open, close, appendFile } from 'node:fs';
+//const path = require('path');
+//const inquirer = require("inquirer");
+import inquirer from 'inquirer';
+//const generateMarkdown = require("./utils/generateMarkdown");
 
 // array of questions for user
 const questions = [
@@ -17,7 +19,7 @@ const questions = [
     },
     {
         type: "editor",
-        name: "tob",
+        name: "toc",
         message: "Table of Contents"
     },
     {
@@ -42,7 +44,7 @@ const questions = [
         message: "Contribution guidelines"
     },
     {
-        type: "input",
+        type: "editor",
         name: "test",
         message: "Test instructions"
     },
@@ -58,11 +60,31 @@ const questions = [
     }
 ];
 
+function closeFd(fd) {
+    close(fd, (err) => {
+      if (err) throw err;
+    });
+}
+
 // function to write README file
-function writeToFile(fileName, data) {
-    fs.appendFile(fileName, data, (err) =>
-            err ? console.error(err) : console.log('Commit logged!')
-    );
+const writeToFile = (file, data) => {
+    open(file, 'a', (err, fd) => {
+        if (err) throw err;
+      
+        try {
+          appendFile(fd, data, 'utf8', (err) => {
+            closeFd(fd);
+            if (err) throw err;
+          });
+        } catch (err) {
+          closeFd(fd);
+          throw err;
+        }
+      });
+
+    //    fs.appendFile(file, data, (err) =>
+//            err ? console.error(err) : console.log('Commit logged!')
+//    );
 }
 
 // function to initialize program
@@ -74,15 +96,15 @@ function init() {
         )
         .then((answers) => {
             // Use user feedback for... whatever!!
-            console.log(answers);
+            //console.log(answers);
 
-            let objSize = Object.objsize(answers);
+            //let objSize = Object.objsize(answers);
 
             // Write the Title of my project
             writeToFile('README.md', `# ${answers.title}\n\n`);
 
             // License badges
-            licenseChooser*(answers.license);
+            licenseChooser(answers.license);
 
             // Project Description
             writeToFile('README.md', '## Description\n');
@@ -90,10 +112,7 @@ function init() {
 
             // Table of Contents
             writeToFile('README.md', '## Table of Contents\n');
-            writeToFile('README.md', `${answers.tob}\n\n`);
-
-            // Table of Content
-            writeToFile('README.md', `# ${answers.title}\n\n`);
+            writeToFile('README.md', `${answers.toc}\n\n`);
 
             // Installation instructions
             writeToFile('README.md', '## Installation\n');
@@ -119,7 +138,7 @@ function init() {
             writeToFile('README.md', `https://www.github.com/${answers.questions}\n\n`);
 
             // Questions email
-            writeToFile('README.md', `https://www.github.com/${answers.email}\n\n`);
+            writeToFile('README.md', `${answers.email}\n\n`);
         });
 }
 
@@ -150,7 +169,7 @@ const licenseChooser = (license) => {
                     break;
         case 'Zlib': writeToFile('README.md', '[![License: Zlib](https://img.shields.io/badge/License-Zlib-lightgrey.svg)](https://opensource.org/licenses/Zlib)\n\n');
                     break;
-        default: ;
+        default: break;
     }
 }
 
@@ -181,7 +200,7 @@ const licenseNotice = (license) => {
                     break;
         case 'Zlib': writeToFile('README.md', '**The zlib/libpng License** \n The zlib license is a permissive free software license which defines the terms under which the zlib software library can be distributed. It is also used by many other free software packages. The libpng library uses a similar license sometimes referred interchangeably as zlib/libpng license.\n\n The zlib license has been approved by the Free Software Foundation (FSF) as a free software license, and by the Open Source Initiative (OSI) as an open source license. It is compatible with the GNU General Public License.\n\n');
                     break;
-        default: ;
+        default: break;
     }
 }
 
